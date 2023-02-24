@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+images:
+- name: quay.io/codefresh/argocd
+  newName: custom_registry/codefresh/argocd
+  newTag: v2.4.15-cap-CR-15677-rollout-rollback
+- name: quay.io/codefresh/applicationset
+  newName: custom_registry/codefresh/applicationset
+  newTag: v0.4.2-CR-13254-remove-private-logs
+- name: ghcr.io/dexidp/dex
+  newName: custom_registry/dexidp/dex
+  newTag: v2.35.3-distroless
+- name: quay.io/codefresh/redis
+  newName: custom_registry/codefresh/redis
+  newTag: 7.0.4-alpine
+
+patches:
+- target:
+    version: v1
+    kind: Service
+    name: argocd-server
+  patch: |
+    - op: add
+      path: /spec/ports/0/appProtocol
+      value: tcp
+
+resources:
+- github.com/codefresh-io/csdp-official/csdp/hybrid/basic/apps/argo-cd?ref=0.1.20
